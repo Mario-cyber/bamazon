@@ -2,6 +2,7 @@
 let inquirer = require("inquirer");
 let mysql = require("mysql");
 
+// stablish connection with MySQL
 var connection = mysql.createConnection({
     host: "localhost",
 
@@ -23,9 +24,19 @@ connection.connect(function (err) {
 });
 
 function afterConnection() {
-    connection.query("SELECT * FROM products", function (err, res) {
+    connection.query("SELECT * FROM products", function (err, response) {
         if (err) throw err;
-        console.log(res);
+        response.forEach(element => {
+
+            console.log("element id: " + element.item_id)
+            console.log("product: " + element.product_name)
+            console.log("price: " + element.price)
+            console.log("stock: " + element.stock_quantity)
+            console.log("-------------------------------------")
+
+            // console.log(element.RowDataPacket.item_id)
+        });
+        // console.log(response);
         connection.end();
     });
 }
