@@ -1,6 +1,7 @@
 // require appropiate npm installs 
-let inquirer = require("inquirer");
+let inq = require("inquirer");
 let mysql = require("mysql");
+let colors = require("colors")
 
 // stablish connection with MySQL
 var connection = mysql.createConnection({
@@ -34,9 +35,35 @@ function afterConnection() {
             console.log("stock: " + element.stock_quantity)
             console.log("-------------------------------------")
 
-            // console.log(element.RowDataPacket.item_id)
         });
+        customerChoice()
         // console.log(response);
         connection.end();
     });
+}
+
+let customerChoice = () => {
+
+    inq.prompt([{
+            type: "input",
+            message: "What would you like to buy? (please provide its ID)",
+            name: "item"
+        },
+        {
+            type: "input",
+            message: "How much of it would you like to buy?",
+            name: "quantity"
+        }
+
+    ]).then((input) => {
+
+        let item = input.item
+        let quantity = input.quantity
+
+        console.log(item)
+        console.log(quantity)
+
+
+    })
+
 }
