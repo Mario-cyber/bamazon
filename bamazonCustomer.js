@@ -2,6 +2,10 @@
 let inq = require("inquirer");
 let mysql = require("mysql");
 let colors = require("colors")
+let itemsAvailable = []
+
+let quantity = 0
+let item = ""
 
 // stablish connection with MySQL
 var connection = mysql.createConnection({
@@ -29,25 +33,28 @@ function afterConnection() {
         if (err) throw err;
         response.forEach(element => {
 
-            console.log("element id: " + element.item_id)
-            console.log("product: " + element.product_name)
-            console.log("price: " + element.price)
-            console.log("stock: " + element.stock_quantity)
+            itemsAvailable.push(element.product_name)
+
+            console.log("product id: ".brightGreen + element.item_id)
+            console.log("product: ".brightGreen + element.product_name)
+            console.log("price: ".brightGreen + element.price)
+            console.log("stock: ".brightGreen + element.stock_quantity)
             console.log("-------------------------------------")
 
         });
         customerChoice()
-        // console.log(response);
         connection.end();
     });
 }
 
+
 let customerChoice = () => {
 
     inq.prompt([{
-            type: "input",
-            message: "What would you like to buy? (please provide its ID)",
-            name: "item"
+            type: "list",
+            message: "What would you like to buy? please select an item!",
+            name: "item",
+            choices: itemsAvailable
         },
         {
             type: "input",
@@ -57,13 +64,14 @@ let customerChoice = () => {
 
     ]).then((input) => {
 
-        let item = input.item
-        let quantity = input.quantity
+        item = input.item
+        quantity = input.quantity
 
-        console.log(item)
+        console.log("item: ".brightBlue + item)
+        console.log("quantity to buy: ".brightBlue + quantity)
+
         console.log(quantity)
-
-
+        console.log(item)
     })
 
 }
