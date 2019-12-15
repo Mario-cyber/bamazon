@@ -32,8 +32,8 @@ function afterConnection() {
         // display items for sale 
         display(response)
 
+        // connection.end();
     });
-    connection.end();
 }
 
 let display = (response) => {
@@ -85,6 +85,30 @@ let customerChoice = (response) => {
 
         if (quantity < chosenItem.stock_quantity) {
             console.log("we have it in stock!".brightBlue)
+            // define logic for definging price 
+            totalPrice = (chosenItem.price * quantity)
+            // logic to update the stock inventory
+            newStock = chosenItem.stock_quantity - quantity
+            console.log("updated stock: " + newStock)
+            connection.query(
+                "update products set ?  where ?",
+                [{
+                        stock_quantity: newStock
+                    },
+                    {
+                        item_id: chosenItem.item_id
+                    }
+                ],
+                function (error) {
+                    if (error) throw error;
+                    // inform the customer of their total
+                    console.log("thank you for your purchase! ".magenta);
+                    console.log("your total is: ".brightGreen +
+                        "$".brightGreen + (totalPrice))
+
+                }
+            )
+
         } else {
             console.log("sorry ! we don't have enough of this".red)
             inq.prompt({
@@ -95,6 +119,7 @@ let customerChoice = (response) => {
             }).then((answer) => {
                 if (answer.continueShopping === "Yes") {
                     afterConnection()
+
                 } else(
                     console.log("Thanks for stopping by !".magenta)
 
