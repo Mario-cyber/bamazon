@@ -4,9 +4,6 @@ let mysql = require("mysql");
 let colors = require("colors")
 let itemsAvailable = []
 
-let quantity = 0
-let item = ""
-
 // stablish connection with MySQL
 var connection = mysql.createConnection({
     host: "localhost",
@@ -28,32 +25,35 @@ connection.connect(function (err) {
     afterConnection();
 });
 
+// after connnection has been stablished run the following function
 function afterConnection() {
     connection.query("SELECT * FROM products", function (err, response) {
         if (err) throw err;
+        // go through response array and extract and display itme info
         response.forEach(element => {
 
             itemsAvailable.push(element.product_name)
 
-            console.log("product id: ".brightGreen + element.item_id)
+            console.log("ID: ".brightGreen + element.item_id)
             console.log("product: ".brightGreen + element.product_name)
             console.log("price: ".brightGreen + element.price)
             console.log("stock: ".brightGreen + element.stock_quantity)
             console.log("-------------------------------------")
 
         });
+
         customerChoice()
         connection.end();
     });
 }
 
-
+// run an inquirer funtion that allos the user to pick an item and a quantity 
 let customerChoice = () => {
 
     inq.prompt([{
             type: "list",
             message: "What would you like to buy? please select an item!",
-            name: "item",
+            name: "userPick",
             choices: itemsAvailable
         },
         {
@@ -62,16 +62,32 @@ let customerChoice = () => {
             name: "quantity"
         }
 
-    ]).then((input) => {
+    ]).then((answer) => {
 
-        item = input.item
-        quantity = input.quantity
+        // define an empty vatiable to populate with users pick
 
-        console.log("item: ".brightBlue + item)
+        let chosenItem = answer.userPick;
+        let quantity = answer.quantity
+
+        // check the array of itemes available and match input to the item in array 
+        // response.forEach(item => {
+        //     if (item === answer.userPick) {
+        //         chosenItem = item
+        //     }
+        // })
+
+        console.log("item: ".brightBlue + chosenItem)
         console.log("quantity to buy: ".brightBlue + quantity)
 
-        console.log(quantity)
-        console.log(item)
-    })
+        // check if the product is in stock
+
+        // if (quantity < this.stock_quantity) {
+        //     console.log("we have it in stock!")
+        // } else {
+        //     console.log("we don't have this")
+        // }
+
+
+    });
 
 }
