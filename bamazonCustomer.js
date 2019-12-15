@@ -29,26 +29,31 @@ connection.connect(function (err) {
 function afterConnection() {
     connection.query("SELECT * FROM products", function (err, response) {
         if (err) throw err;
-        // go through response array and extract and display itme info
-        response.forEach(element => {
+        // display items for sale 
+        display(response)
 
-            itemsAvailable.push(element.product_name)
-
-            console.log("ID: ".brightGreen + element.item_id)
-            console.log("product: ".brightGreen + element.product_name)
-            console.log("price: ".brightGreen + element.price)
-            console.log("stock: ".brightGreen + element.stock_quantity)
-            console.log("-------------------------------------")
-
-        });
-
-        customerChoice()
-        connection.end();
+        // connection.end();
     });
 }
 
+let display = (response) => {
+
+    response.forEach(element => {
+
+        itemsAvailable.push(element.product_name)
+
+        console.log("ID: ".brightGreen + element.item_id)
+        console.log("product: ".brightGreen + element.product_name)
+        console.log("price: ".brightGreen + element.price)
+        console.log("stock: ".brightGreen + element.stock_quantity)
+        console.log("-------------------------------------")
+
+    });
+    customerChoice(response)
+}
+
 // run an inquirer funtion that allos the user to pick an item and a quantity 
-let customerChoice = () => {
+let customerChoice = (response) => {
 
     inq.prompt([{
             type: "list",
@@ -66,27 +71,60 @@ let customerChoice = () => {
 
         // define an empty vatiable to populate with users pick
 
-        let chosenItem = answer.userPick;
-        let quantity = answer.quantity
+        let chosenItem;
+        let quantity = parseInt(answer.quantity)
 
         // check the array of itemes available and match input to the item in array 
-        // response.forEach(item => {
-        //     if (item === answer.userPick) {
-        //         chosenItem = item
-        //     }
-        // })
+        response.forEach(element => {
+            if (element.product_name === answer.userPick) {
+                chosenItem = element
+            }
+        })
 
-        console.log("item: ".brightBlue + chosenItem)
-        console.log("quantity to buy: ".brightBlue + quantity)
+        // check if you have enough inventory to fulfill order
 
-        // check if the product is in stock
+        if (quantity < chosenItem.stock_quantity) {
+            console.log("we have it in stock!".brightBlue)
+            // define logic for definging price 
+            totalPrice = (chosenItem.price * quantity)
+            // logic to update the stock inventory
+            newStock = chosenItem.stock_quantity - quantity
+            console.log("updated stock: " + newStock)
+            connection.query(
+                "update products set ?  where ?",
+                [{
+                        stock_quantity: newStock
+                    },
+                    {
+                        item_id: chosenItem.item_id
+                    }
+                ],
+                function (error) {
+                    if (error) throw error;
+                    // inform the customer of their total
+                    console.log("thank you for your purchase! ".magenta);
+                    console.log("your total is: ".brightGreen +
+                        "$".brightGreen + (totalPrice))
+                }
+            )
 
-        // if (quantity < this.stock_quantity) {
-        //     console.log("we have it in stock!")
-        // } else {
-        //     console.log("we don't have this")
-        // }
+        } else {
+            console.log("sorry ! we don't have enough of this".red)
+            inq.prompt({
+                type: "list",
+                name: "continueShopping",
+                choices: ["Yes", "No"],
+                message: "would you like to continue shopping ?"
+            }).then((answer) => {
+                if (answer.continueShopping === "Yes") {
+                    afterConnection()
+                } else(
+                    console.log("Thanks for stopping by !".magenta)
 
+
+                )
+            })
+        }
 
     });
 

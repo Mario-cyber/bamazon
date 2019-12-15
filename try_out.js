@@ -105,7 +105,6 @@ let customerChoice = (response) => {
                     console.log("thank you for your purchase! ".magenta);
                     console.log("your total is: ".brightGreen +
                         "$".brightGreen + (totalPrice))
-
                 }
             )
 
@@ -119,7 +118,6 @@ let customerChoice = (response) => {
             }).then((answer) => {
                 if (answer.continueShopping === "Yes") {
                     afterConnection()
-
                 } else(
                     console.log("Thanks for stopping by !".magenta)
 
