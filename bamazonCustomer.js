@@ -32,7 +32,7 @@ function afterConnection() {
         // display items for sale 
         display(response)
 
-        // connection.end();
+        connection.end();
     });
 }
 
@@ -120,8 +120,6 @@ let customerChoice = (response) => {
                     afterConnection()
                 } else(
                     console.log("Thanks for stopping by !".magenta)
-
-
                 )
             })
         }
