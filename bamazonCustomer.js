@@ -32,7 +32,7 @@ function afterConnection() {
         // display items for sale 
         display(response)
 
-        connection.end();
+        // connection.end();
     });
 }
 
@@ -50,6 +50,22 @@ let display = (response) => {
 
     });
     customerChoice(response)
+}
+
+let prompt = () => {
+    inq.prompt([{
+        type: "list",
+        name: "buy",
+        message: "Would you like to buy something else?",
+        choices: ["Yes", "No"]
+    }]).then(res => {
+        if (res.buy === "Yes") {
+            afterConnection();
+        } else {
+            console.log("Thank you for stopping by!".magenta)
+            connection.end();
+        }
+    })
 }
 
 // run an inquirer funtion that allos the user to pick an item and a quantity 
@@ -105,23 +121,17 @@ let customerChoice = (response) => {
                     console.log("thank you for your purchase! ".magenta);
                     console.log("your total is: ".brightGreen +
                         "$".brightGreen + (totalPrice))
-                }
-            )
 
+                    prompt();
+
+                }
+
+            )
         } else {
             console.log("sorry ! we don't have enough of this".red)
-            inq.prompt({
-                type: "list",
-                name: "continueShopping",
-                choices: ["Yes", "No"],
-                message: "would you like to continue shopping ?"
-            }).then((answer) => {
-                if (answer.continueShopping === "Yes") {
-                    afterConnection()
-                } else(
-                    console.log("Thanks for stopping by !".magenta)
-                )
-            })
+
+            prompt()
+
         }
 
     });
